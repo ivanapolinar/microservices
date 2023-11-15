@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      #Inventory service routes
+      routes[0]:
+        id: inventory-service
+        uri: lb://inventory-service
+        predicates[0]: Path=/api/inventory/**
+      #Order service routes
+      routes[1]:
+        id: orders-service
+        uri: lb://orders-service
+        predicates[0]: Path=/api/order/**
+      #Order service routes
+      routes[2]:
+        id: products-service
+        uri: lb://products-service
+        predicates[0]: Path=/api/product/**
+      #Discovery service routes
+      routes[3]:
+        id: discovery-service
+        uri: http://localhost:8761
+        predicates[0]: Path=/eureka/web
+        filters[0]: SetPath=/
+      #Discovery service routes
+      routes[4]:
+        id: discovery-service-static
+        uri: http://localhost:8761
+        predicates[0]: Path=/eureka/**
+      default-filters[0]: SaveSession
+      default-filters[1]: TokenRelay
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            provider: keycloak
+            scope: openid
+            client-id: microservices_client
+            client-secret: xIVVX5YlCrfixYjVJ27XScb3ZoFqjHGr
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8181/realms/microservices-realm
+
+#Eureka client
+eureka:
+  client:
+    service-url:
+      default-zone: http://eureka:password@localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+server:
+  port: 8080
+
+#Log
+logging:
+  level:
+    root: info
+    org.springframework.cloud.gateway: trace
+    org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: info
+

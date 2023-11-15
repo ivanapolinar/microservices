@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: products-service
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ms_products
+    username: ivra
+    password: Test123
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          jwk-set-uri: http://localhost:8181/realms/microservices-realm/protocol/openid-connect/certs
+
+  #Eureka client
+  eureka:
+    client:
+      service-url:
+        default-zone: http://eureka:password@localhost:8761/eureka
+    instance:
+      instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+server:
+  port: 0
+
+###Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+      base-path: /actuator/products
